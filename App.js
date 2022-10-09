@@ -3,43 +3,66 @@ import { useEffect,useState } from 'react';
 import { StyleSheet, Text, View,ScrollView,Dimensions,
 ActivityIndicator
 } from 'react-native';
+import getXY from './getXY';
+import returnSky from './returnSky';
 
 const API_KEY = 'COCEejn2UXeAoSoljMOHyqJ88%2FOq7swd%2BVv6R1N1Q4X5%2FriHHsciOzELW35RPSk0n0DSsM0On5sV%2BV26c1MOYw%3D%3D';
 
 export default function App() {
+const returnsky = new returnSky();
+const getXy = new getXY();
+  const  now = new Date();
+var month = now.getUTCMonth() + 1; //months from 1-12
+var day = now.getDate();
+var year = now.getFullYear();
 
-  const today={
-    year:new Date().getFullYear(),
-    month:new Date().getMonth()+1,
-    date:new Date().getDate()
-  }
+month = month.toString();
+if(day<10){
+day = day.toString();
+day ="0"+day;
+} else{
+  day = day.toString();
+}
+year = year.toString();
+
+const today = year + month + day;
+const hours = now.getHours()-1;
+
+const nowTime = hours.toString()+now.getMinutes().toString();
+
 
   const [city,setCity] = useState("Loading...");
   const [days,setDays] = useState([]);
   const [location,setLocation] = useState(); 
   const [ok,setOk] = useState(true);
+  const [skyResult,setSkyResult]=useState(undefined);
   const ask = async() =>{
     const {granted} = await Location.requestForegroundPermissionsAsync();
   if(!granted){
     setOk(false);
   }
+  
+
     const {coords:{latitude,longitude}}= await Location.getCurrentPositionAsync({accuracy:5});
     const location = await Location.reverseGeocodeAsync({latitude,longitude},{useGoogleMaps:false});  
     setCity(location[0].city);
-    var xhr = new XMLHttpRequest();
-    var url = 'http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtNcst'; /*URL*/
+    const rs = getXy.dfs_xy_conv("toXY",latitude,longitude);
+    console.log(rs);
+    console.log(rs.x);
+    var url = 'http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtFcst'; /*URL*/
 var queryParams = '?' + encodeURIComponent('serviceKey') + '='+API_KEY; /*Service Key*/
 queryParams += '&' + encodeURIComponent('pageNo') + '=' + encodeURIComponent('1'); /**/
 queryParams += '&' + encodeURIComponent('numOfRows') + '=' + encodeURIComponent('266'); /**/
 queryParams += '&' + encodeURIComponent('dataType') + '=' + encodeURIComponent('json'); /**/
-queryParams += '&' + encodeURIComponent('code') + '=' + encodeURIComponent('24'); /**/
-queryParams += '&' + encodeURIComponent('base_time') + '=' + encodeURIComponent('0500'); /**/
-queryParams += '&' + encodeURIComponent('base_date') + '=' + encodeURIComponent(new Date()); /**/
-queryParams += '&' + encodeURIComponent('nx') + '=' + encodeURIComponent('61'); /**/
-queryParams += '&' + encodeURIComponent('ny') + '=' + encodeURIComponent('114'); /**/
+queryParams += '&' + encodeURIComponent('code') + '=' + encodeURIComponent('24'); /**/ 
+queryParams += '&' + encodeURIComponent('base_time') + '=' + encodeURIComponent(nowTime); /**/
+queryParams += '&' + encodeURIComponent('base_date') + '=' + encodeURIComponent(today); /**/
+queryParams += '&' + encodeURIComponent('nx') + '=' + encodeURIComponent(rs.x); /**/
+queryParams += '&' + encodeURIComponent('ny') + '=' + encodeURIComponent(rs.y); /**/
 
 
-xhr.open('GET', url + queryParams);
+
+const response = await fetch(url + queryParams);
 
 // xhr.onreadystatechange = function () {
 //     if (this.readyState == 4) {
@@ -47,10 +70,15 @@ xhr.open('GET', url + queryParams);
 //         // console.log('Status: '+this.status+'nHeaders: '+JSON);
 //     }
 // };
+const json = await response.json();
 
-xhr.send('');
+const sky = json.response.body.items.item[18].fcstValue;
+const skyResult = returnsky.returnValue(sky);
+setSkyResult(skyResult);
+console.log(skyResult);
+console.log("?");
 
-console.log(xhr.response);
+
 
     // const response = await fetch(url+queryParams);
     // console.log(response+"?");
@@ -72,11 +100,13 @@ console.log(xhr.response);
       showsHorizontalScrollIndicator={false} 
       horizontal  
       contentContainerStyle={styles.weather}>
-    {days==undefined?
+    {skyResult==undefined?
  ( <View style={styles.day}>
   <ActivityIndicator color="white" size="large"></ActivityIndicator>
 </View>) : 
-(<View></View>)  
+(<View>
+  <Text>{skyResult}</Text>
+</View>)  
   }
       </ScrollView>
 
