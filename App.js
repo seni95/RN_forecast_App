@@ -4,7 +4,7 @@ import { StyleSheet, Text, View,ScrollView,Dimensions,
 ActivityIndicator
 } from 'react-native';
 
-const API_KEY = 'COCEejn2UXeAoSoljMOHyqJ88%2FOq7swd%2BVv6R1N1Q4X5%2FriHHsciOzELW35RPSk0n0DSsM0On5sV%2BV26c1MOYw%3D%3D';
+const API_KEY = '59a2af02503a9fc4c0dd72c1048a3295';
 
 export default function App() {
 
@@ -26,32 +26,10 @@ export default function App() {
     const {coords:{latitude,longitude}}= await Location.getCurrentPositionAsync({accuracy:5});
     const location = await Location.reverseGeocodeAsync({latitude,longitude},{useGoogleMaps:false});  
     setCity(location[0].city);
-    var xhr = new XMLHttpRequest();
-    var url = 'http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtNcst'; /*URL*/
-var queryParams = '?' + encodeURIComponent('serviceKey') + '='+API_KEY; /*Service Key*/
-queryParams += '&' + encodeURIComponent('pageNo') + '=' + encodeURIComponent('1'); /**/
-queryParams += '&' + encodeURIComponent('numOfRows') + '=' + encodeURIComponent('266'); /**/
-queryParams += '&' + encodeURIComponent('dataType') + '=' + encodeURIComponent('json'); /**/
-queryParams += '&' + encodeURIComponent('code') + '=' + encodeURIComponent('24'); /**/
-queryParams += '&' + encodeURIComponent('base_time') + '=' + encodeURIComponent('0500'); /**/
-queryParams += '&' + encodeURIComponent('base_date') + '=' + encodeURIComponent(new Date()); /**/
-queryParams += '&' + encodeURIComponent('nx') + '=' + encodeURIComponent('61'); /**/
-queryParams += '&' + encodeURIComponent('ny') + '=' + encodeURIComponent('114'); /**/
-
-
-xhr.open('GET', url + queryParams);
-
-// xhr.onreadystatechange = function () {
-//     if (this.readyState == 4) {
-//       console.log()
-//         // console.log('Status: '+this.status+'nHeaders: '+JSON);
-//     }
-// };
-
-xhr.send('');
-
-console.log(xhr.response);
-
+   const response = await fetch(`https://api.openweathermap.org/data/2.5/onecall?lat=${latitude}&lon=${longitude}&exclude=alerts&appid=${API_KEY}`);
+    const json = await response.json();
+    
+    console.log(json);
     // const response = await fetch(url+queryParams);
     // console.log(response+"?");
     // const json = await response.json();
