@@ -18,6 +18,16 @@ var day = now.getDate();
 var year = now.getFullYear();
 
 month = month.toString();
+
+const hours = now.getHours()-1;
+const nowTime = hours.toString()+now.getMinutes().toString();
+
+if(hours<5){
+day = day-1;
+}
+
+console.log(day);
+
 if(day<10){
 day = day.toString();
 day ="0"+day;
@@ -27,8 +37,8 @@ day ="0"+day;
 year = year.toString();
 
 const today = year + month + day;
-const hours = now.getHours()-2;
-const nowTime = hours.toString()+now.getMinutes().toString();
+
+
 
   const [city,setCity] = useState("Loading...");
   const [days,setDays] = useState([]);
@@ -53,7 +63,7 @@ queryParams += '&' + encodeURIComponent('numOfRows') + '=' + encodeURIComponent(
 queryParams += '&' + encodeURIComponent('dataType') + '=' + encodeURIComponent('json'); /**/
 queryParams += '&' + encodeURIComponent('code') + '=' + encodeURIComponent('24'); /**/ 
 queryParams += '&' + encodeURIComponent('base_time') + '=' + encodeURIComponent(nowTime); /**/
-queryParams += '&' + encodeURIComponent('base_date') + '=' + encodeURIComponent(today); /**/
+queryParams += '&' + encodeURIComponent('base_date') + '=' + encodeURIComponent('20221010'); /**/
 queryParams += '&' + encodeURIComponent('nx') + '=' + encodeURIComponent(rs.x); /**/
 queryParams += '&' + encodeURIComponent('ny') + '=' + encodeURIComponent(rs.y); /**/
 
