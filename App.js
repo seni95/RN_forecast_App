@@ -4,7 +4,7 @@ import { StyleSheet, Text, View,ScrollView,Dimensions,
 ActivityIndicator
 } from 'react-native';
 
-const API_KEY = '59a2af02503a9fc4c0dd72c1048a3295';
+const API_KEY = '03fb0586ba74a916cb5ec0524b8235e8';
 
 export default function App() {
 
@@ -29,7 +29,7 @@ export default function App() {
    const response = await fetch(`https://api.openweathermap.org/data/3.0/onecall?lat=${latitude}&lon=${longitude}&exclude=alerts&appid=${API_KEY}`);
     const json = await response.json();
     
-    console.log(json.cod);
+    console.log(longitude);
     // const response = await fetch(url+queryParams);
     // console.log(response+"?");
     // const json = await response.json();
