@@ -26,10 +26,10 @@ export default function App() {
     const {coords:{latitude,longitude}}= await Location.getCurrentPositionAsync({accuracy:5});
     const location = await Location.reverseGeocodeAsync({latitude,longitude},{useGoogleMaps:false});  
     setCity(location[0].city);
-   const response = await fetch(`https://api.openweathermap.org/data/2.5/onecall?lat=${latitude}&lon=${longitude}&exclude=alerts&appid=${API_KEY}`);
+   const response = await fetch(`https://api.openweathermap.org/data/3.0/onecall?lat=${latitude}&lon=${longitude}&exclude=alerts&appid=${API_KEY}`);
     const json = await response.json();
     
-    console.log(json);
+    console.log(json.cod);
     // const response = await fetch(url+queryParams);
     // console.log(response+"?");
     // const json = await response.json();
