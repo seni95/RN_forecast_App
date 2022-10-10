@@ -1,15 +1,16 @@
 import * as Location from 'expo-location';
 import { useEffect,useState } from 'react';
 import { StyleSheet, Text, View,ScrollView,Dimensions,
-ActivityIndicator
+ActivityIndicator,Image
 } from 'react-native';
 import getXY from './getXY';
-import returnSky from './returnSky';
+import skyStatus from './returnSky';
+// import status1 from './weather_img/status_1.jpg'
 
 const API_KEY = 'COCEejn2UXeAoSoljMOHyqJ88%2FOq7swd%2BVv6R1N1Q4X5%2FriHHsciOzELW35RPSk0n0DSsM0On5sV%2BV26c1MOYw%3D%3D';
 
 export default function App() {
-const returnsky = new returnSky();
+const sky_status = new skyStatus();
 const getXy = new getXY();
   const  now = new Date();
 var month = now.getUTCMonth() + 1; //months from 1-12
@@ -35,7 +36,7 @@ const nowTime = hours.toString()+now.getMinutes().toString();
   const [days,setDays] = useState([]);
   const [location,setLocation] = useState(); 
   const [ok,setOk] = useState(true);
-  const [skyResult,setSkyResult]=useState(undefined);
+  const [skyResult,setSkyResult]=useState([]);
   const ask = async() =>{
     const {granted} = await Location.requestForegroundPermissionsAsync();
   if(!granted){
@@ -47,8 +48,6 @@ const nowTime = hours.toString()+now.getMinutes().toString();
     const location = await Location.reverseGeocodeAsync({latitude,longitude},{useGoogleMaps:false});  
     setCity(location[0].city);
     const rs = getXy.dfs_xy_conv("toXY",latitude,longitude);
-    console.log(rs);
-    console.log(rs.x);
     var url = 'http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtFcst'; /*URL*/
 var queryParams = '?' + encodeURIComponent('serviceKey') + '='+API_KEY; /*Service Key*/
 queryParams += '&' + encodeURIComponent('pageNo') + '=' + encodeURIComponent('1'); /**/
@@ -71,14 +70,35 @@ const response = await fetch(url + queryParams);
 //     }
 // };
 const json = await response.json();
+const forecastArray = json.response.body.items.item;
+const sky = []
+let i=0;
+forecastArray.map(item=>
+  { 
+    if(item.category=="SKY"){
+      sky[i] = item;
+      i++;
+    }
+  });
+// const skyResult = returnsky.returnValue(sky);
+// setSkyResult(skyResult);
+  const statusValue = sky.map(i=>i.fcstValue);
+  // console.log(test);
+  // console.log("??");
+console.log("??");
 
-const sky = json.response.body.items.item[18].fcstValue;
-const skyResult = returnsky.returnValue(sky);
-setSkyResult(skyResult);
-console.log(skyResult);
-console.log("?");
+  const skyResult = [];
+
+  i=0;
+  statusValue.map(item=>{
+  skyResult[i] = sky_status.returnValue(item);  
+  i++;
+  })
 
 
+  console.log(skyResult);
+
+  setSkyResult(skyResult);
 
     // const response = await fetch(url+queryParams);
     // console.log(response+"?");
@@ -104,9 +124,22 @@ console.log("?");
  ( <View style={styles.day}>
   <ActivityIndicator color="white" size="large"></ActivityIndicator>
 </View>) : 
-(<View>
-  <Text>{skyResult}</Text>
-</View>)  
+(
+
+  // <View>
+  //   <Text>{skyResult}</Text>
+  // </View>
+  skyResult.map(item=>(
+    <View style={styles.day}>
+      <View>
+        {/* <Image
+        source={require('status1')}
+        ></Image> */}
+      </View>
+      <Text>{item[1]}</Text>
+    </View>
+  ))
+)  
   }
       </ScrollView>
 
