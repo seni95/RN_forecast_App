@@ -5,7 +5,7 @@ ActivityIndicator,Image
 } from 'react-native';
 import getXY from './getXY';
 import skyStatus from './returnSky';
-// import status1 from './weather_img/status_1.jpg'
+
 
 const API_KEY = 'COCEejn2UXeAoSoljMOHyqJ88%2FOq7swd%2BVv6R1N1Q4X5%2FriHHsciOzELW35RPSk0n0DSsM0On5sV%2BV26c1MOYw%3D%3D';
 
@@ -27,10 +27,8 @@ day ="0"+day;
 year = year.toString();
 
 const today = year + month + day;
-const hours = now.getHours()-1;
-
+const hours = now.getHours()-2;
 const nowTime = hours.toString()+now.getMinutes().toString();
-
 
   const [city,setCity] = useState("Loading...");
   const [days,setDays] = useState([]);
@@ -85,7 +83,6 @@ forecastArray.map(item=>
   const statusValue = sky.map(i=>i.fcstValue);
   // console.log(test);
   // console.log("??");
-console.log("??");
 
   const skyResult = [];
 
@@ -129,16 +126,19 @@ console.log("??");
   // <View>
   //   <Text>{skyResult}</Text>
   // </View>
-  skyResult.map(item=>(
-    <View style={styles.day}>
-      <View>
-        {/* <Image
-        source={require('status1')}
-        ></Image> */}
-      </View>
-      <Text>{item[1]}</Text>
-    </View>
-  ))
+  skyResult.map(item=>{
+
+return   (<View style={styles.day}>
+  {/* <View>
+    <Image
+    style={styles.img}
+    source={require('./weather_img/status_1.jpg')}
+    ></Image>
+  </View> */}
+  <Text>{item[1]}</Text>
+</View>)
+
+})
 )  
   }
       </ScrollView>
@@ -177,5 +177,9 @@ fontSize:178
 desc:{
   marginTop:-30,
   fontSize:60
+},
+img:{
+  width:100,
+  height:100
 }
 });
