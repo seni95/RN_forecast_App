@@ -96,28 +96,44 @@ export default function App() {
     const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?units=metric&lat=${latitude}&lon=${longitude}&appid=${API_KEY}`);
     const json = await response.json();
     setCurrent(json);
-  
-    const hourlyDataResponse = await fetch(`https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&appid=${API_KEY}&units=metric`);
-    const jsonHourlyData = await hourlyDataResponse.json();
-    setHourlyData(jsonHourlyData);
-    console.log("to Check");
-    // console.log(hourlyData.list);
-
-    hourlyData.list.map((data)=>{
-     
-      if(data.dt_txt.substr(11,20)==="12:00:00" &&
-      data.dt_txt.substr(0,10)!=today){
-        console.log(data.dt_txt);
-        setDayForecast([...dayForecast,data]);
-      }
-    })
+   
 
   }
 
+  const setDetailData = async()=>{
+  
+      const {coords:{latitude,longitude}}= await Location.getCurrentPositionAsync({accuracy:5});
+      const location = await Location.reverseGeocodeAsync({latitude,longitude},{useGoogleMaps:false});  
+      setCity(location[0].city);
+      const response = await fetch(`https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&appid=${API_KEY}&units=metric`);
+      const json = await response.json();
+      setHourlyData(json);
 
+    console.log(hourlyData);
+    console.log("??");
+         hourlyData.list.map((data)=>{
+     
+        if(data.dt_txt.substr(11,20)==="12:00:00" &&
+        data.dt_txt.substr(0,10)!=today){
+          console.log(data.dt_txt);
+          setDayForecast(dayForecast.concat(data));
+        }
+      })
+
+      
+     
+  }
+
+  const settingDetailInfo = async()=>{
+
+    console.log(dayForecast);
+  
+  }
 
   useEffect(()=>{
     setData();
+    setDetailData();
+    settingDetailInfo();
   },[])
 
   return (
@@ -130,7 +146,8 @@ export default function App() {
       showsHorizontalScrollIndicator={false} 
       horizontal  
       contentContainerStyle={styles.weather}>
-    {current.weather==null||dayForecast[0]==null?
+    {current.weather==null?
+    // ||dayForecast[0]==null?
  ( <View style={styles.day}>
   <ActivityIndicator color="white" size="large"></ActivityIndicator>
 </View>) : 
@@ -144,15 +161,16 @@ export default function App() {
     </View>
   </View>
 
-  {console.log()}
-  <View style={styles.day}>
+
+  {/* {console.log(dayForecast)} */}
+  {/* <View style={styles.day}>
   <View>{mainImg[dayForecast[1].weather[0].main]}</View>
       <Text>{`${dayForecast[1].dt_txt} "${weather[dayForecast[1].weather[0].main]}"`}</Text>
     <View>
     <Fontisto name={icons[dayForecast[1].weather[0].main]} size={24} color="black" />
     <Text>최고기온:{Math.floor(dayForecast[1].main.temp_max)}도, 최저기온:{Math.floor(dayForecast[1].main.temp_min)}도</Text>
     </View>
-  </View>
+  </View> */}
 
 
   </>
@@ -182,12 +200,14 @@ fontWeight:"500"
 },
 
 weather:{
-justifyContent:"center"
+  width:Dimensions.get('window').width*5,
+justifyContent:"space-between"
 }
 ,
 day:{
-  width:Dimensions.get('window').width-10,
+  width:327,
   alignItems:"center",
+
 },
 temp:{
   marginTop:50, 
@@ -198,8 +218,7 @@ desc:{
   fontSize:60
 },
 mainImg:{
-  width:Dimensions.get('window').width-10,
-
+  width:"100%",
   height:Dimensions.get('window').width/2
 }
 });
